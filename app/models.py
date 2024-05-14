@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 
 
 class NotesCategoriesCategoryIdGetResponse(BaseModel):
-    pass
+    categories: List[str]
 
 
 class NotesCategoriesGetResponse(BaseModel):

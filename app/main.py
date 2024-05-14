@@ -19,6 +19,8 @@ from .models import (
     NotesTagsPostResponse,
 )
 
+import uvicorn
+
 app = FastAPI(
     title="YNotes",
     description="",
@@ -31,7 +33,15 @@ def get_notes(keyword: Optional[str] = None) -> NotesGetResponse:
     """
     検索
     """
-    pass
+    return NotesGetResponse(
+        note={
+            "title": "title",
+            "content": "content",
+            "summary": "summary",
+            "subCategories": ["subCategories"],
+            "comments": ["comments"],
+        }
+    )
 
 
 @app.post("/notes", response_model=NotesPostResponse)
@@ -39,7 +49,7 @@ def post_notes(file: UploadFile) -> NotesPostResponse:
     """
     解析
     """
-    pass
+    return NotesPostResponse(noteId="noteId", tags=["tags"])
 
 
 @app.get("/notes/categories", response_model=NotesCategoriesGetResponse)
@@ -47,7 +57,7 @@ def get_notes_categories() -> NotesCategoriesGetResponse:
     """
     分類取得
     """
-    pass
+    return NotesCategoriesGetResponse(categories=["categories"])
 
 
 @app.get(
@@ -60,7 +70,7 @@ def get_notes_categories_category_id(
     """
     副分類取得
     """
-    pass
+    return NotesCategoriesCategoryIdGetResponse(categories=["categories"])
 
 
 @app.post("/notes/tags", response_model=NotesTagsPostResponse)
@@ -68,7 +78,7 @@ def post_notes_tags(body: NotesTagsPostRequest = None) -> NotesTagsPostResponse:
     """
     タグ追加
     """
-    pass
+    return NotesTagsPostResponse()
 
 
 @app.patch("/notes/tags", response_model=NotesTagsPatchResponse)
@@ -76,4 +86,10 @@ def patch_notes_tags(body: NotesTagsPatchRequest = None) -> NotesTagsPatchRespon
     """
     タグ更新
     """
-    pass
+    return NotesTagsPatchResponse()
+
+
+if __name__ == "__main__":
+    config = uvicorn.Config("main:app", port=5000, log_level="info")
+    server = uvicorn.Server(config)
+    server.run()
