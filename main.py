@@ -8,7 +8,7 @@ from typing import Optional
 
 from fastapi import FastAPI, Path, UploadFile
 
-from .models import (
+from app import (
     NotesCategoriesCategoryIdGetResponse,
     NotesCategoriesGetResponse,
     NotesGetResponse,
@@ -18,8 +18,6 @@ from .models import (
     NotesTagsPostRequest,
     NotesTagsPostResponse,
 )
-
-import uvicorn
 
 app = FastAPI(
     title="YNotes",
@@ -88,8 +86,5 @@ def patch_notes_tags(body: NotesTagsPatchRequest = None) -> NotesTagsPatchRespon
     """
     return NotesTagsPatchResponse()
 
-
 if __name__ == "__main__":
-    config = uvicorn.Config("main:app", port=5000, log_level="info")
-    server = uvicorn.Server(config)
-    server.run()
+    app.run()
