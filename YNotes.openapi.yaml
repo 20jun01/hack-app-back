@@ -1,0 +1,214 @@
+openapi: 3.0.1
+info:
+  title: YNotes
+  description: ''
+  version: 1.0.0
+tags: []
+paths:
+  /notes/categories/{categoryId}:
+    get:
+      summary: 副分類取得
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: categoryId
+          in: path
+          description: ''
+          required: true
+          example: '"math"'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security: []
+  /notes/categories:
+    get:
+      summary: 分類取得
+      deprecated: false
+      description: ''
+      tags: []
+      parameters: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      type: string
+                      faker: '"math"'
+                required:
+                  - categories
+      security: []
+  /notes:
+    get:
+      summary: 検索
+      deprecated: false
+      description: ''
+      tags: []
+      parameters:
+        - name: keyword
+          in: query
+          description: 検索キーワード
+          required: false
+          example: '"a"'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  note:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                      content:
+                        type: string
+                      summary:
+                        type: string
+                      subCategories:
+                        type: array
+                        items:
+                          type: string
+                      comments:
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - title
+                      - content
+                      - subCategories
+                required:
+                  - note
+              examples:
+                '1':
+                  summary: 成功例
+                  value:
+                    note:
+                      title: title1
+                      content: http:example.png
+                      summary: this title is AAA
+                      subCategories:
+                        - subcat1
+                        - subcat2
+                      comments:
+                        - ''
+      security: []
+    post:
+      summary: 解析
+      deprecated: false
+      description: ''
+      tags: []
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  format: binary
+                  type: string
+                  description: 解析対象のノートの画像
+                  example: >-
+                    cmMtdXBsb2FkLTE3MTU1NjY2OTM4NzEtMg==/DALL·E 2024-04-24
+                    11.13.03 - An abstract and data-inspired representation of a
+                    dark cyber space, focusing on digital data elements. Imagine
+                    a visual composition resembling data fl.webp
+              required:
+                - file
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  noteId:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - noteId
+                  - tags
+      security: []
+  /notes/tags:
+    post:
+      summary: タグ追加
+      deprecated: false
+      description: ''
+      tags: []
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  description: 追加するタグ
+              required:
+                - tags
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security: []
+    patch:
+      summary: タグ更新
+      deprecated: false
+      description: タグの更新API
+      tags: []
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  description: 新たなタグ
+              required:
+                - tags
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security: []
+components:
+  schemas: {}
+  securitySchemes: {}
+servers: []
