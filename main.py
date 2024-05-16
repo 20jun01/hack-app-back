@@ -25,7 +25,10 @@ from app import (
 
 class Main:
     def __init__(self):
-        self.db = Database(Config())
+        config = Config()
+        self.db = Database(
+            config.DB_HOST, config.DB_NAME, config.DB_USER, config.DB_PASSWORD
+        )
 
         self.app = FastAPI(
             title="YNotes",
@@ -106,5 +109,6 @@ class Main:
 
 if __name__ == "__main__":
     import uvicorn
+
     main = Main()
     uvicorn.run(main.app, host="0.0.0.0", port=8000)
