@@ -7,4 +7,4 @@ class Database:
         self.connection = psycopg2.connect(f"host={config.DB_HOST} dbname={config.DB_NAME} user={config.DB_USER} password={config.DB_PASSWORD}")
 
         # カーソルをオープンします。
-        cursor = self.connection.cursor()
+        self.cursor = self.connection.cursor()
