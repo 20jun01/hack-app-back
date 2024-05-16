@@ -17,3 +17,7 @@ run:
 .PHONY: deactivate
 deactivate:
 	deactivate
+
+.PHONY: export
+export:
+	pip freeze > requirements.txt

@@ -18,88 +18,93 @@ from app import (
     NotesTagsPatchResponse,
     NotesTagsPostRequest,
     NotesTagsPostResponse,
-)
-
-app = FastAPI(
-    title="YNotes",
-    description="",
-    version="1.0.0",
-)
-
-origins = [
-    "http://localhost:8080",
-    "http://localhost:8080/",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    Database,
+    Config,
 )
 
 
-@app.get("/notes", response_model=NotesGetResponse)
-def get_notes(keyword: Optional[str] = None) -> NotesGetResponse:
-    """
-    検索
-    """
-    return NotesGetResponse(
-        note={
-            "title": "title",
-            "content": "content",
-            "summary": "summary",
-            "subCategories": ["subCategories"],
-            "comments": ["comments"],
-        }
-    )
+class Main:
+    def __init__(self):
+        self.db = Database(Config())
 
+        self.app = FastAPI(
+            title="YNotes",
+            description="",
+            version="1.0.0",
+        )
 
-@app.post("/notes", response_model=NotesPostResponse)
-def post_notes(file: UploadFile) -> NotesPostResponse:
-    """
-    解析
-    """
-    return NotesPostResponse(noteId="noteId", tags=["tags"])
+        origins = [
+            "http://localhost:8080",
+            "http://localhost:8080/",
+        ]
 
+        self.app.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
-@app.get("/notes/categories", response_model=NotesCategoriesGetResponse)
-def get_notes_categories() -> NotesCategoriesGetResponse:
-    """
-    分類取得
-    """
-    return NotesCategoriesGetResponse(categories=["categories"])
+        @self.app.get("/notes", response_model=NotesGetResponse)
+        def get_notes(keyword: Optional[str] = None) -> NotesGetResponse:
+            """
+            検索
+            """
+            return NotesGetResponse(
+                note={
+                    "title": "title",
+                    "content": "content",
+                    "summary": "summary",
+                    "subCategories": ["subCategories"],
+                    "comments": ["comments"],
+                }
+            )
 
+        @self.app.post("/notes", response_model=NotesPostResponse)
+        def post_notes(file: UploadFile) -> NotesPostResponse:
+            """
+            解析
+            """
+            return NotesPostResponse(noteId="noteId", tags=["tags"])
 
-@app.get(
-    "/notes/categories/{categoryId}",
-    response_model=NotesCategoriesCategoryIdGetResponse,
-)
-def get_notes_categories_category_id(
-    category_id: str = Path(..., alias="categoryId")
-) -> NotesCategoriesCategoryIdGetResponse:
-    """
-    副分類取得
-    """
-    return NotesCategoriesCategoryIdGetResponse(categories=["categories"])
+        @self.app.get("/notes/categories", response_model=NotesCategoriesGetResponse)
+        def get_notes_categories() -> NotesCategoriesGetResponse:
+            """
+            分類取得
+            """
+            return NotesCategoriesGetResponse(categories=["categories"])
 
+        @self.app.get(
+            "/notes/categories/{categoryId}",
+            response_model=NotesCategoriesCategoryIdGetResponse,
+        )
+        def get_notes_categories_category_id(
+            category_id: str = Path(..., alias="categoryId")
+        ) -> NotesCategoriesCategoryIdGetResponse:
+            """
+            副分類取得
+            """
+            return NotesCategoriesCategoryIdGetResponse(categories=["categories"])
 
-@app.post("/notes/tags", response_model=NotesTagsPostResponse)
-def post_notes_tags(body: NotesTagsPostRequest = None) -> NotesTagsPostResponse:
-    """
-    タグ追加
-    """
-    return NotesTagsPostResponse()
+        @self.app.post("/notes/tags", response_model=NotesTagsPostResponse)
+        def post_notes_tags(body: NotesTagsPostRequest = None) -> NotesTagsPostResponse:
+            """
+            タグ追加
+            """
+            return NotesTagsPostResponse()
 
-
-@app.patch("/notes/tags", response_model=NotesTagsPatchResponse)
-def patch_notes_tags(body: NotesTagsPatchRequest = None) -> NotesTagsPatchResponse:
-    """
-    タグ更新
-    """
-    return NotesTagsPatchResponse()
+        @self.app.patch("/notes/tags", response_model=NotesTagsPatchResponse)
+        def patch_notes_tags(
+            body: NotesTagsPatchRequest = None,
+        ) -> NotesTagsPatchResponse:
+            """
+            タグ更新
+            """
+            return NotesTagsPatchResponse()
 
 
 if __name__ == "__main__":
-    app.run()
+    import uvicorn
+    main = Main()
+    uvicorn.run(main.app, host="0.0.0.0", port=8000)
