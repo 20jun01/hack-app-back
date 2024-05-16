@@ -50,12 +50,12 @@ class Main:
             allow_headers=["*"],
         )
 
-        self.app.router.lifespan_context = lifespan
-
         @asynccontextmanager
         async def lifespan(app: FastAPI):
             self.db.migrate()
             yield
+
+        self.app.router.lifespan_context = lifespan
 
         @self.app.get("/notes", response_model=NotesGetResponse)
         def get_notes(
@@ -110,9 +110,11 @@ class Main:
         @self.app.post(
             "/notes/tags",
             response_model=NotesTagsPostResponse,
-            db_session=Depends(self.db.get_db_session),
         )
-        def post_notes_tags(body: NotesTagsPostRequest = None) -> NotesTagsPostResponse:
+        def post_notes_tags(
+            body: NotesTagsPostRequest = None,
+            db_session=Depends(self.db.get_db_session),
+        ) -> NotesTagsPostResponse:
             """
             タグ追加
             """
@@ -121,10 +123,10 @@ class Main:
         @self.app.patch(
             "/notes/tags",
             response_model=NotesTagsPatchResponse,
-            db_session=Depends(self.db.get_db_session),
         )
         def patch_notes_tags(
             body: NotesTagsPatchRequest = None,
+            db_session=Depends(self.db.get_db_session),
         ) -> NotesTagsPatchResponse:
             """
             タグ更新
