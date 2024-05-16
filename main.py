@@ -6,8 +6,9 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import FastAPI, Path, UploadFile
+from fastapi import FastAPI, Path, UploadFile, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
 from app import (
     NotesCategoriesCategoryIdGetResponse,
@@ -49,8 +50,18 @@ class Main:
             allow_headers=["*"],
         )
 
+        self.app.router.lifespan_context = lifespan
+
+        @asynccontextmanager
+        async def lifespan(app: FastAPI):
+            self.db.migrate()
+            yield
+
         @self.app.get("/notes", response_model=NotesGetResponse)
-        def get_notes(keyword: Optional[str] = None) -> NotesGetResponse:
+        def get_notes(
+            keyword: Optional[str] = None,
+            db_session=Depends(self.db.get_db_session),
+        ) -> NotesGetResponse:
             """
             検索
             """
@@ -65,14 +76,19 @@ class Main:
             )
 
         @self.app.post("/notes", response_model=NotesPostResponse)
-        def post_notes(file: UploadFile) -> NotesPostResponse:
+        def post_notes(
+            file: UploadFile,
+            db_session=Depends(self.db.get_db_session),
+        ) -> NotesPostResponse:
             """
             解析
             """
             return NotesPostResponse(noteId="noteId", tags=["tags"])
 
         @self.app.get("/notes/categories", response_model=NotesCategoriesGetResponse)
-        def get_notes_categories() -> NotesCategoriesGetResponse:
+        def get_notes_categories(
+            db_session=Depends(self.db.get_db_session),
+        ) -> NotesCategoriesGetResponse:
             """
             分類取得
             """
@@ -83,21 +99,30 @@ class Main:
             response_model=NotesCategoriesCategoryIdGetResponse,
         )
         def get_notes_categories_category_id(
-            category_id: str = Path(..., alias="categoryId")
+            category_id: str = Path(..., alias="categoryId"),
+            db_session=Depends(self.db.get_db_session),
         ) -> NotesCategoriesCategoryIdGetResponse:
             """
             副分類取得
             """
             return NotesCategoriesCategoryIdGetResponse(categories=["categories"])
 
-        @self.app.post("/notes/tags", response_model=NotesTagsPostResponse)
+        @self.app.post(
+            "/notes/tags",
+            response_model=NotesTagsPostResponse,
+            db_session=Depends(self.db.get_db_session),
+        )
         def post_notes_tags(body: NotesTagsPostRequest = None) -> NotesTagsPostResponse:
             """
             タグ追加
             """
             return NotesTagsPostResponse()
 
-        @self.app.patch("/notes/tags", response_model=NotesTagsPatchResponse)
+        @self.app.patch(
+            "/notes/tags",
+            response_model=NotesTagsPatchResponse,
+            db_session=Depends(self.db.get_db_session),
+        )
         def patch_notes_tags(
             body: NotesTagsPatchRequest = None,
         ) -> NotesTagsPatchResponse:
