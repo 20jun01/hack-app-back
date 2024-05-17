@@ -17,7 +17,7 @@ def get_now():
 
 class User(Base):
     __tablename__ = "users"
-    user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     username = Column(String(50), unique=True, nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String(200), nullable=False)
@@ -27,44 +27,44 @@ class User(Base):
 
 class NoteTag(Base):
     __tablename__ = "note_tags"
-    note_id = Column(UUID(as_uuid=True), ForeignKey("notes.note_id"), primary_key=True)
-    tag_id = Column(UUID(as_uuid=True), ForeignKey("tags.tag_id"), primary_key=True)
+    note_id = Column(UUID(as_uuid=True), ForeignKey("notes.id"), primary_key=True)
+    tag_id = Column(UUID(as_uuid=True), ForeignKey("tags.id"), primary_key=True)
 
 
 class NoteCategory(Base):
     __tablename__ = "note_categories"
-    note_id = Column(UUID(as_uuid=True), ForeignKey("notes.note_id"), primary_key=True)
+    note_id = Column(UUID(as_uuid=True), ForeignKey("notes.id"), primary_key=True)
     category_id = Column(
-        UUID(as_uuid=True), ForeignKey("categories.category_id"), primary_key=True
+        UUID(as_uuid=True), ForeignKey("categories.id"), primary_key=True
     )
 
 
 class CategorySubCategory(Base):
     __tablename__ = "category_sub_categories"
     category_id = Column(
-        UUID(as_uuid=True), ForeignKey("categories.category_id"), primary_key=True
+        UUID(as_uuid=True), ForeignKey("categories.id"), primary_key=True
     )
     sub_category_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("sub_categories.sub_category_id"),
+        ForeignKey("sub_categories.id"),
         primary_key=True,
     )
 
 
 class NoteSubCategory(Base):
     __tablename__ = "notes_sub_categories"
-    note_id = Column(UUID(as_uuid=True), ForeignKey("notes.note_id"), primary_key=True)
+    note_id = Column(UUID(as_uuid=True), ForeignKey("notes.id"), primary_key=True)
     sub_category_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("sub_categories.sub_category_id"),
+        ForeignKey("sub_categories.id"),
         primary_key=True,
     )
 
 
 class Note(Base):
     __tablename__ = "notes"
-    note_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id"), nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     title = Column(String(200), nullable=False)
     image_id = Column(Text)
     summary = Column(Text)
@@ -81,23 +81,23 @@ class Note(Base):
 
 class Tag(Base):
     __tablename__ = "tags"
-    tag_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(50), unique=True, nullable=False)
     notes = relationship("Note", secondary=NoteTag.__tablename__, back_populates="tags")
 
 
 class Comment(Base):
     __tablename__ = "comments"
-    comment_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    note_id = Column(UUID(as_uuid=True), ForeignKey("notes.note_id"), nullable=False)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id"), nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    note_id = Column(UUID(as_uuid=True), ForeignKey("notes.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     content = Column(Text, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), default=get_now)
 
 
 class Category(Base):
     __tablename__ = "categories"
-    category_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(50), unique=True, nullable=False)
     notes = relationship(
         "Note", secondary=NoteCategory.__tablename__, back_populates="categories"
@@ -111,7 +111,7 @@ class Category(Base):
 
 class SubCategory(Base):
     __tablename__ = "sub_categories"
-    sub_category_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(50), unique=True, nullable=False)
     categories = relationship(
         "Category",

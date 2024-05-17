@@ -17,7 +17,14 @@ class NotesCategoriesGetResponse(BaseModel):
     categories: List[str]
 
 
-class Note(BaseModel):
+class NoteRes(BaseModel):
+    title: str
+    content: str
+    summary: Optional[str] = None
+    subCategories: List[str]
+    comments: Optional[List[str]] = None
+
+class NoteReq(BaseModel):
     title: str
     content: str
     summary: Optional[str] = None
@@ -26,7 +33,7 @@ class Note(BaseModel):
 
 
 class NotesGetResponse(BaseModel):
-    note: Note
+    note: NoteRes
 
 
 class NotesPostRequest(BaseModel):
