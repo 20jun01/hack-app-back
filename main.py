@@ -21,6 +21,8 @@ from app import (
     NotesTagsPostResponse,
     Database,
     Config,
+    S3Client,
+    ChatGPTAPI,
 )
 
 
@@ -30,6 +32,9 @@ class Main:
         self.db = Database(
             config.DB_HOST, config.DB_NAME, config.DB_USER, config.DB_PASSWORD
         )
+
+        self.s3 = S3Client(config.S3_BUCKET_NAME)
+        self.chatgpt = ChatGPTAPI(config.OPEN_AI_API_KEY)
 
         self.app = FastAPI(
             title="YNotes",
