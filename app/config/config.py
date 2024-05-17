@@ -7,7 +7,7 @@ from logging import getLogger, config
 class Config:
     def __init__(self) -> None:
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir, "data/log_config.json")
+        file_path = os.path.join(current_dir, "data/logger_config.json")
         with open(file_path) as f:
             log_conf = json.load(f)
 
