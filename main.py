@@ -159,7 +159,7 @@ class Main:
                 notes_by_tags = []
                 for tag in tags:
                     notes_by_tag = note_repo.get_notes_by_tag(tag)
-                    notes_by_tags.append(notes_by_tag)
+                    notes_by_tags.extend(notes_by_tag)
 
                 return NotesPostResponse(
                     noteId=str(note_id), tags=response.tags, notes=notes_by_tags
