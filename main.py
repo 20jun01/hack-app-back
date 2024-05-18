@@ -42,7 +42,7 @@ class Main:
         )
 
         self.s3 = MyS3Client(config.S3_BUCKET_NAME)
-        self.chatgpt = ChatGPTAPI(config.OPEN_AI_API_KEY)
+        self.chatgpt = ChatGPTAPI(config.OPEN_AI_API_KEY, config.OPEN_AI_ORGANIZATION_ID)
 
         self.app = FastAPI(
             title="YNotes",
@@ -101,7 +101,7 @@ class Main:
                 note_repo = NoteRepository(db_session)
 
                 file_object: BufferedReader = file.file
-                file_bytes: bytes = await file_object.read()
+                file_bytes: bytes = file_object.read()
 
                 image_base64 = encode_image_base64(file_bytes)
                 response: ChatGPTResponse = self.chatgpt.describe_image(image_base64)

@@ -23,6 +23,7 @@ class Config:
 
         # OPEN AI
         self.OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY", "")
+        self.OPEN_AI_ORGANIZATION_ID = os.getenv("OPEN_AI_ORGANIZATION_ID", "")
 
         # S3
         self.S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME", "ynotes")

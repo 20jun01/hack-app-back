@@ -20,9 +20,10 @@ class ChatGPTModels:
 
 
 class ChatGPTAPI:
-    def __init__(self, API_KEY: str):
+    def __init__(self, API_KEY: str, ORGANIZATION_ID: str):
         self.openai_api_key = API_KEY
         openai.api_key = API_KEY
+        self.organization_id = ORGANIZATION_ID
         self.template = self._load_template()
 
     def _load_template(self) -> dict:
@@ -54,6 +55,7 @@ class ChatGPTAPI:
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.openai_api_key}",
+            "ORGANIZAION_ID": self.organization_id,
         }
         payload = {
             "model": model,
@@ -91,7 +93,7 @@ class ChatGPTAPI:
 
         res = response.json()
         logger.info(res)
-        return self._convert_answer_to_response(res)
+        return self._convert_answer_to_response(res['choices'][0]['message']['content'])
 
     def describe_image(
         self,
@@ -105,6 +107,7 @@ class ChatGPTAPI:
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.openai_api_key}",
+            "ORGANIZAION_ID": self.organization_id,
         }
         payload = {
             "model": model,
@@ -139,7 +142,8 @@ class ChatGPTAPI:
 
         res = response.json()
         logger.info(res)
-        return self._convert_answer_to_response(res)
+        print(res)
+        return self._convert_answer_to_response(res['choices'][0]['message']['content'])
 
     async def async_describe_uploaded_image(
         self,
@@ -150,7 +154,7 @@ class ChatGPTAPI:
         if template is None:
             template = self.template["describe_image"]
 
-        client = OpenAI(self.openai_api_key)
+        client = OpenAI(self.openai_api_key, organization=self.organization_id)
         messages = [
             {
                 "role": "system",
@@ -193,7 +197,7 @@ class ChatGPTAPI:
         if template is None:
             template = self.template["describe_image"]
 
-        client = OpenAI(self.openai_api_key)
+        client = OpenAI(self.openai_api_key, organization=self.organization_id)
         messages = [
             {
                 "role": "system",
