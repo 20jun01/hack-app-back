@@ -37,19 +37,10 @@ class CategoryRepository:
         if result:
             return result[0]
 
-        print("its not exist")
         dbCategory = Category(id=uuid.uuid4(), name=category)
 
-        self.db_session.execute(
-            text(
-                """
-            INSERT INTO categories (id, name)
-            VALUES (:id, :name)
-            RETURNING id;
-            """
-            ),
-            {"id": dbCategory.id, "name": dbCategory.name},
-        )
+        self.db_session.add(dbCategory)
+        self.db_session.commit()
 
         return dbCategory.id
 
@@ -65,26 +56,19 @@ class CategoryRepository:
         else:
             dbSubCategory = SubCategory(id=uuid.uuid4(), name=sub_category)
 
-            self.db_session.execute(
-                text(
-                    """
-                INSERT INTO sub_categories (id, name)
-                VALUES (:id, :name)
-                RETURNING id;
-                """
-                ),
-                {"id": dbSubCategory.id, "name": dbSubCategory.name},
-            )
+            self.db_session.add(dbSubCategory)
             sub_category_id = dbSubCategory.id
 
-        self.db_session.execute(
-            text(
-                """
-            INSERT INTO category_sub_categories (category_id, sub_category_id)
-            VALUES (:category_id, :sub_category_id);
-            """
-            ),
-            {"category_id": category_id, "sub_category_id": sub_category_id},
+        if self.db_session.query(CategorySubCategory).filter(
+            CategorySubCategory.category_id == category_id,
+            CategorySubCategory.sub_category_id == sub_category_id,
+        ).first():
+            return sub_category_id
+        self.db_session.add(
+            CategorySubCategory(
+                category_id=category_id, sub_category_id=sub_category_id
+            )
         )
-
+        
+        self.db_session.commit()
         return sub_category_id

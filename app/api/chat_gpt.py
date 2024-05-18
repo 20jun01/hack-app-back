@@ -93,7 +93,7 @@ class ChatGPTAPI:
 
         res = response.json()
         logger.info(res)
-        return self._convert_answer_to_response(res['choices'][0]['message']['content'])
+        return self._convert_answer_to_response(res["choices"][0]["message"]["content"])
 
     def describe_image(
         self,
@@ -142,7 +142,7 @@ class ChatGPTAPI:
 
         res = response.json()
         logger.info(res)
-        return self._convert_answer_to_response(res['choices'][0]['message']['content'])
+        return self._convert_answer_to_response(res["choices"][0]["message"]["content"])
 
     async def async_describe_uploaded_image(
         self,

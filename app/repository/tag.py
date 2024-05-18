@@ -5,6 +5,7 @@ from sqlalchemy.sql import text
 from typing import List
 import uuid
 
+
 class TagRepository:
     def __init__(self, db_session: scoped_session):
         self.db_session = db_session
@@ -45,7 +46,7 @@ class TagRepository:
             dbTag = Tag(id=uuid.uuid4(), name=tag)
             self.db_session.add(dbTag)
             tag_ids.append(dbTag.id)
-        
+
         return tag_ids
 
     def update_tag(

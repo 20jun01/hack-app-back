@@ -1,9 +1,9 @@
-from ..db import Note, Category, SubCategory, Tag, NoteCategory, NoteSubCategory, NoteTag
+from ..db import Note, NoteCategory, NoteSubCategory, NoteTag, SubCategory
 from ..model import NoteRes, NoteReq
 from sqlalchemy.orm import scoped_session
 from typing import List, Optional
 import uuid
-
+from sqlalchemy.orm.exc import NoResultFound
 
 class NoteRepository:
     def __init__(self, db_session: scoped_session):
@@ -14,17 +14,18 @@ class NoteRepository:
             NoteTag(
                 note_id=note_id,
                 tag_id=tag_id,
-            ) for tag_id in tag_ids
+            )
+            for tag_id in tag_ids
         ]
         self.db_session.add_all(note_tags)
-
 
     def create_note_category(self, note_id: str, category_ids: List[str]):
         note_categories = [
             NoteCategory(
                 note_id=note_id,
                 category_id=category_id,
-            ) for category_id in category_ids
+            )
+            for category_id in category_ids
         ]
         self.db_session.add_all(note_categories)
 
@@ -33,7 +34,8 @@ class NoteRepository:
             NoteSubCategory(
                 note_id=note_id,
                 sub_category_id=sub_category_id,
-            ) for sub_category_id in sub_category_ids
+            )
+            for sub_category_id in sub_category_ids
         ]
         self.db_session.add_all(note_sub_categories)
 
@@ -48,10 +50,17 @@ class NoteRepository:
             tags=dbNote.tags,
         )
 
-    def create_note(self, note: NoteReq, category_ids: List[str], sub_category_ids_map: dict, tag_ids: List[str]):
+    def create_note(
+        self,
+        note: NoteReq,
+        category_ids: List[uuid.UUID],
+        sub_category_ids_map: dict,
+        tag_ids: List[uuid.UUID],
+        user_id: uuid.UUID,
+    ):
         dbNote: Note = Note(
             id=uuid.uuid4(),
-            user_id=uuid.uuid4(),
+            user_id=user_id,
             title=note.title,
             image_id=note.url,
             summary=note.summary,
@@ -60,7 +69,8 @@ class NoteRepository:
         self.db_session.commit()
 
         self.create_note_category(dbNote.id, category_ids)
-        self.create_note_sub_category(dbNote.id, sub_category_ids_map)
+        for v in category_ids:
+            self.create_note_sub_category(dbNote.id, sub_category_ids_map[v])
         self.create_note_tag(dbNote.id, tag_ids)
 
         return dbNote.id

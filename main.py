@@ -31,6 +31,7 @@ from app import (
     TagRepository,
     NoteRepository,
     ChatGPTResponse,
+    UserRepository,
     encode_image_base64,
 )
 
@@ -100,11 +101,6 @@ class Main:
             解析
             """
             with db_session as db_session:
-                # initialize repository
-                note_repo = NoteRepository(db_session)
-                tag_repo = TagRepository(db_session)
-                category_repo = CategoryRepository(db_session)
-
                 file_object: BufferedReader = file.file
                 file_bytes: bytes = file_object.read()
 
@@ -112,6 +108,14 @@ class Main:
                 response: ChatGPTResponse = self.chatgpt.describe_image(image_base64)
                 file_extension: str = file.filename.split(".")[-1]
 
+                user_repo = UserRepository(db_session)
+
+                user_id = user_repo.create_user(
+                    "test", "test@example.com", "testpassword"
+                )
+                db_session.commit()
+
+                category_repo = CategoryRepository(db_session)
                 categories = [response.category]
                 category_ids = []
                 subCategories = [response.subcategory]
@@ -119,16 +123,23 @@ class Main:
                 for category in categories:
                     category_id = category_repo.create_category(category)
                     category_ids.append(category_id)
+                    db_session.commit()
                     sub_category_ids_map[category_id] = []
                     for sub_category in subCategories:
                         sub_category_id = category_repo.create_sub_category(
                             sub_category, category_id
                         )
+                        print(sub_category_id)
                         sub_category_ids_map[category_id].append(sub_category_id)
+                    db_session.commit()
 
+                tag_repo = TagRepository(db_session)
                 tags = response.tags
 
                 tag_ids = tag_repo.create_tags(tags)
+                db_session.commit()
+
+                note_repo = NoteRepository(db_session)
 
                 image_url = self.s3.upload_image(file_object, file_extension)
                 note_req = NoteReq(
@@ -140,7 +151,7 @@ class Main:
                     tags=response.tags,
                 )
                 note_id = note_repo.create_note(
-                    note_req, category_ids, sub_category_ids_map, tag_ids
+                    note_req, category_ids, sub_category_ids_map, tag_ids, user_id
                 )
                 db_session.commit()
                 return NotesPostResponse(noteId=str(note_id), tags=response.tags)

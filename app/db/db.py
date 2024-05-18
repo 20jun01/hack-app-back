@@ -31,7 +31,7 @@ class Database:
         finally:
             # 後処理
             session.close()
-    
+
     @contextmanager
     def get_db_session_no_commit(self):
         # 前処理
