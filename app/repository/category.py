@@ -58,7 +58,7 @@ class CategoryRepository:
 
             self.db_session.add(dbSubCategory)
             sub_category_id = dbSubCategory.id
-
+            self.db_session.commit()
         if self.db_session.query(CategorySubCategory).filter(
             CategorySubCategory.category_id == category_id,
             CategorySubCategory.sub_category_id == sub_category_id,
