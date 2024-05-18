@@ -1,7 +1,8 @@
-from ..db import Note
+from ..db import Note, Category, SubCategory, Tag
 from ..model import NoteRes, NoteReq
 from sqlalchemy.orm import scoped_session
 from typing import List, Optional
+import uuid
 
 
 class NoteRepository:
@@ -20,14 +21,31 @@ class NoteRepository:
         )
 
     def create_note(self, note: NoteReq):
-        dbNote = Note(
+        categories: List[Category] = [
+            Category(
+                name=category,
+            ) for category in note.categories
+        ]
+        subcategories: List[SubCategory] = [
+            SubCategory(
+                name=subcategory,
+            ) for subcategory in note.subCategories
+        ]
+        tags: List[Tag] = [
+            Tag(
+                name=tag,
+            ) for tag in note.tags
+        ]
+
+        dbNote: Note = Note(
+            user_id=uuid.uuid4(),
             title=note.title,
             image_id=note.url,
             summary=note.summary,
-            categories=note.categories,
-            sub_categories=note.subCategories,
-            tags=note.tags,
-        ).returning(Note.id)
+            categories=categories,
+            sub_categories=subcategories,
+            tags=tags,
+        )
         self.db_session.add(dbNote)
 
         return dbNote.id

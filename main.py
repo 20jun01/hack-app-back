@@ -43,7 +43,9 @@ class Main:
         )
 
         self.s3 = MyS3Client(config.S3_BUCKET_NAME)
-        self.chatgpt = ChatGPTAPI(config.OPEN_AI_API_KEY, config.OPEN_AI_ORGANIZATION_ID)
+        self.chatgpt = ChatGPTAPI(
+            config.OPEN_AI_API_KEY, config.OPEN_AI_ORGANIZATION_ID
+        )
 
         self.app = FastAPI(
             title="YNotes",
@@ -100,6 +102,8 @@ class Main:
             with db_session as db_session:
                 # initialize repository
                 note_repo = NoteRepository(db_session)
+                tag_repo = TagRepository(db_session)
+                category_repo = CategoryRepository(db_session)
 
                 file_object: BufferedReader = file.file
                 file_bytes: bytes = file_object.read()
@@ -107,17 +111,26 @@ class Main:
                 image_base64 = encode_image_base64(file_bytes)
                 response: ChatGPTResponse = self.chatgpt.describe_image(image_base64)
                 file_extension: str = file.filename.split(".")[-1]
+
+                categories = [response.category]
+                subCategories = [response.subcategory]
+                for category in categories:
+                    category_id = category_repo.create_category(category)
+                    db_session.flush()
+                    for sub_category in subCategories:
+                        category_repo.create_sub_category(sub_category, category_id)
+
                 image_url = self.s3.upload_image(file_object, file_extension)
-                note_req =  NoteReq(
+                note_req = NoteReq(
                     title=response.title,
                     url=image_url,
-                    categories=[response.category],
+                    categories=categories,
                     summary=response.summary,
-                    subCategories=[response.subcategory],
+                    subCategories=subCategories,
                     tags=response.tags,
                 )
                 note_id = note_repo.create_note(note_req)
-                return NotesPostResponse(noteId=note_id, tags=response.tags)
+                return NotesPostResponse(noteId=str(note_id), tags=response.tags)
 
         @self.app.get("/notes/categories", response_model=NotesCategoriesGetResponse)
         def get_notes_categories(
