@@ -25,6 +25,8 @@ from app import (
     Config,
     MyS3Client,
     ChatGPTAPI,
+    CategoryRepository,
+    TagRepository,
     NoteRepository,
     ChatGPTResponse,
     encode_image_base64,
@@ -109,7 +111,9 @@ class Main:
             """
             分類取得
             """
-            return NotesCategoriesGetResponse(categories=["categories"])
+            category_repo = CategoryRepository(db_session)
+            categories = category_repo.get_categories()
+            return NotesCategoriesGetResponse(categories=categories)
 
         @self.app.get(
             "/notes/categories/{categoryId}",
@@ -122,33 +126,41 @@ class Main:
             """
             副分類取得
             """
-            return NotesCategoriesCategoryIdGetResponse(categories=["categories"])
+            category_repo = CategoryRepository(db_session)
+            categories = category_repo.get_sub_categories(category_id)
+            return NotesCategoriesCategoryIdGetResponse(categories=categories)
 
         @self.app.post(
-            "/notes/tags",
+            "/notes/{noteId}/tags",
             response_model=NotesTagsPostResponse,
         )
         def post_notes_tags(
             body: NotesTagsPostRequest = None,
+            note_id: str = Path(..., alias="noteId"),
             db_session=Depends(self.db.get_db_session),
         ) -> NotesTagsPostResponse:
             """
-            タグ追加
+            タグ作成
             """
-            return NotesTagsPostResponse()
+            tag_repo = TagRepository(db_session)
+            response = tag_repo.create_tag(body, note_id)
+            return response
 
         @self.app.patch(
-            "/notes/tags",
+            "/notes/{noteId}/tags",
             response_model=NotesTagsPatchResponse,
         )
         def patch_notes_tags(
             body: NotesTagsPatchRequest = None,
+            note_id: str = Path(..., alias="noteId"),
             db_session=Depends(self.db.get_db_session),
         ) -> NotesTagsPatchResponse:
             """
             タグ更新
             """
-            return NotesTagsPatchResponse()
+            tag_repo = TagRepository(db_session)
+            response = tag_repo.update_tag(body, note_id)
+            return response
 
 
 if __name__ == "__main__":

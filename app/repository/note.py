@@ -1,4 +1,4 @@
-from ..db import Note
+from ..db import Note, Tag
 from ..model import NoteRes, NoteReq
 from sqlalchemy.orm import scoped_session
 from typing import List, Optional
@@ -28,7 +28,6 @@ class NoteRepository:
             sub_categories=note.subCategories,
             tags=note.tags,
         ).returning(Note.id)
-
         self.db_session.add(dbNote)
 
         return dbNote.id

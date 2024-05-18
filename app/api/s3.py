@@ -11,7 +11,9 @@ class MyS3Client:
         self.bucket_name = bucket_name
         self.upload_dir = "notes"
 
-    async def async_upload_image(self, file: BufferedReader, file_extension: str) -> str:
+    async def async_upload_image(
+        self, file: BufferedReader, file_extension: str
+    ) -> str:
         upload_path = f"{self.upload_dir}/{uuid.uuid4()}.{file_extension}"
         self.client.upload_fileobj(file, self.bucket_name, upload_path)
         url: str = f"https://{self.bucket_name}.s3.amazonaws.com/{upload_path}"

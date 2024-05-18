@@ -84,7 +84,9 @@ class ChatGPTAPI:
 
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                "https://api.openai.com/v1/chat/completions", headers=headers, json=payload
+                "https://api.openai.com/v1/chat/completions",
+                headers=headers,
+                json=payload,
             )
 
         res = response.json()
@@ -150,27 +152,27 @@ class ChatGPTAPI:
 
         client = OpenAI(self.openai_api_key)
         messages = [
-                {
-                    "role": "system",
-                    "content": [{"type": "text", "text": f"{template['system']}"}],
-                },
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": f"{template['prompt']}"},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"{image_url}",
-                            },
+            {
+                "role": "system",
+                "content": [{"type": "text", "text": f"{template['system']}"}],
+            },
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": f"{template['prompt']}"},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"{image_url}",
                         },
-                    ],
-                },
-                {
-                    "role": "assistant",
-                    "content": [{"type": "text", "text": f"{template['assistant']}"}],
-                },
-            ]
+                    },
+                ],
+            },
+            {
+                "role": "assistant",
+                "content": [{"type": "text", "text": f"{template['assistant']}"}],
+            },
+        ]
 
         response = client.chat.completions.create(
             model=model,
@@ -193,28 +195,28 @@ class ChatGPTAPI:
 
         client = OpenAI(self.openai_api_key)
         messages = [
-                {
-                    "role": "system",
-                    "content": [{"type": "text", "text": f"{template['system']}"}],
-                },
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": f"{template['prompt']}"},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"{image_url}",
-                            },
+            {
+                "role": "system",
+                "content": [{"type": "text", "text": f"{template['system']}"}],
+            },
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": f"{template['prompt']}"},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"{image_url}",
                         },
-                    ],
-                },
-                {
-                    "role": "assistant",
-                    "content": [{"type": "text", "text": f"{template['assistant']}"}],
-                },
-            ]
-        
+                    },
+                ],
+            },
+            {
+                "role": "assistant",
+                "content": [{"type": "text", "text": f"{template['assistant']}"}],
+            },
+        ]
+
         response = client.chat.completions.create(
             model=model,
             messages=messages,
@@ -224,6 +226,7 @@ class ChatGPTAPI:
         res = response.choices[0].message
         logger.info(res)
         return self._convert_answer_to_response(res)
+
 
 """
 ## ChatGPT Response Example
