@@ -45,6 +45,7 @@ class NotesPostRequest(BaseModel):
 class NotesPostResponse(BaseModel):
     noteId: str
     tags: List[str]
+    notes: List[NoteRes]
 
 
 class NotesTagsPostRequest(BaseModel):

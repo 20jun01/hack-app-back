@@ -1,4 +1,4 @@
-from ..db import Note, NoteCategory, NoteSubCategory, NoteTag, SubCategory
+from ..db import Note, NoteCategory, NoteSubCategory, NoteTag, Tag
 from ..model import NoteRes, NoteReq
 from sqlalchemy.orm import scoped_session
 from typing import List, Optional
@@ -86,6 +86,29 @@ class NoteRepository:
         else:
             dbNotes: List[Note] = self.db_session.query(Note).all()
         print(dbNotes)
+        return [
+            NoteRes(
+                title=dbNote.title,
+                categories=[category.name for category in dbNote.categories],
+                summary=dbNote.summary,
+                subCategories=[
+                    sub_category.name for sub_category in dbNote.sub_categories
+                ],
+                tags=[
+                    tag.name for tag in dbNote.tags
+                ]
+            )
+            for dbNote in dbNotes
+        ]
+    
+    def get_notes_by_tag(self, tag: str) -> List[NoteRes]:
+        dbNotes: List[Note] = (
+            self.db_session.query(Note)
+            .join(NoteTag)
+            .join(Tag)
+            .filter(Tag.name == tag)
+            .all()
+        )
         return [
             NoteRes(
                 title=dbNote.title,

@@ -153,7 +153,13 @@ class Main:
                     note_req, category_ids, sub_category_ids_map, tag_ids, user_id
                 )
                 db_session.commit()
-                return NotesPostResponse(noteId=str(note_id), tags=response.tags)
+
+                notes_by_tags = []
+                for tag in tags:
+                    notes_by_tag = note_repo.get_notes_by_tag(tag)
+                    notes_by_tags.append(notes_by_tag)
+
+                return NotesPostResponse(noteId=str(note_id), tags=response.tags, notes=notes_by_tags)
 
         @self.app.get("/notes/categories", response_model=NotesCategoriesGetResponse)
         def get_notes_categories(
