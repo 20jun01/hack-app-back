@@ -10,6 +10,8 @@ from fastapi import FastAPI, Path, UploadFile, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from io import BufferedReader
+from sqlalchemy.orm import Session
+from typing import Generator
 
 from app import (
     NotesCategoriesCategoryIdGetResponse,
@@ -71,48 +73,57 @@ class Main:
         @self.app.get("/notes", response_model=NotesGetResponse)
         def get_notes(
             keyword: Optional[str] = None,
-            db_session=Depends(self.db.get_db_session),
+            db_session: Generator[Session, None, None] = Depends(
+                self.db.get_db_session
+            ),
         ) -> NotesGetResponse:
             """
             検索
             """
-            note_repo = NoteRepository(db_session)
-            notes = note_repo.get_notes(keyword)
+            with db_session as db_session:
+                note_repo = NoteRepository(db_session)
+                notes = note_repo.get_notes(keyword)
 
-            return NotesGetResponse(notes=notes)
+                return NotesGetResponse(notes=notes)
 
         @self.app.post("/notes", response_model=NotesPostResponse)
         async def post_notes(
             file: UploadFile,
-            db_session=Depends(self.db.get_db_session),
+            db_session: Generator[Session, None, None] = Depends(
+                self.db.get_db_session
+            ),
         ) -> NotesPostResponse:
             """
             解析
             """
-            # initialize repository
-            note_repo = NoteRepository(db_session)
+            with db_session as db_session:
+                # initialize repository
+                note_repo = NoteRepository(db_session)
 
-            file_object: BufferedReader = file.file
-            file_bytes: bytes = await file_object.read()
+                file_object: BufferedReader = file.file
+                file_bytes: bytes = await file_object.read()
 
-            image_base64 = encode_image_base64(file_bytes)
-            response: ChatGPTResponse = self.chatgpt.describe_image(image_base64)
-            file_extension: str = file.filename.split(".")[-1]
-            image_url = self.s3.upload_image(file_object, file_extension)
-            response.url = image_url
-            note_id = note_repo.create_note(response)
-            return NotesPostResponse(noteId=note_id, tags=response.tags)
+                image_base64 = encode_image_base64(file_bytes)
+                response: ChatGPTResponse = self.chatgpt.describe_image(image_base64)
+                file_extension: str = file.filename.split(".")[-1]
+                image_url = self.s3.upload_image(file_object, file_extension)
+                response.url = image_url
+                note_id = note_repo.create_note(response)
+                return NotesPostResponse(noteId=note_id, tags=response.tags)
 
         @self.app.get("/notes/categories", response_model=NotesCategoriesGetResponse)
         def get_notes_categories(
-            db_session=Depends(self.db.get_db_session),
+            db_session: Generator[Session, None, None] = Depends(
+                self.db.get_db_session
+            ),
         ) -> NotesCategoriesGetResponse:
             """
             分類取得
             """
-            category_repo = CategoryRepository(db_session)
-            categories = category_repo.get_categories()
-            return NotesCategoriesGetResponse(categories=categories)
+            with db_session as db_session:
+                category_repo = CategoryRepository(db_session)
+                categories = category_repo.get_categories()
+                return NotesCategoriesGetResponse(categories=categories)
 
         @self.app.get(
             "/notes/categories/{categoryId}",
@@ -120,14 +131,17 @@ class Main:
         )
         def get_notes_categories_category_id(
             category_id: str = Path(..., alias="categoryId"),
-            db_session=Depends(self.db.get_db_session),
+            db_session: Generator[Session, None, None] = Depends(
+                self.db.get_db_session
+            ),
         ) -> NotesCategoriesCategoryIdGetResponse:
             """
             副分類取得
             """
-            category_repo = CategoryRepository(db_session)
-            categories = category_repo.get_sub_categories(category_id)
-            return NotesCategoriesCategoryIdGetResponse(categories=categories)
+            with db_session as db_session:
+                category_repo = CategoryRepository(db_session)
+                categories = category_repo.get_sub_categories(category_id)
+                return NotesCategoriesCategoryIdGetResponse(categories=categories)
 
         @self.app.post(
             "/notes/{noteId}/tags",
@@ -136,14 +150,17 @@ class Main:
         def post_notes_tags(
             body: NotesTagsPostRequest = None,
             note_id: str = Path(..., alias="noteId"),
-            db_session=Depends(self.db.get_db_session),
+            db_session: Generator[Session, None, None] = Depends(
+                self.db.get_db_session
+            ),
         ) -> NotesTagsPostResponse:
             """
             タグ作成
             """
-            tag_repo = TagRepository(db_session)
-            response = tag_repo.create_tag(body, note_id)
-            return response
+            with db_session as db_session:
+                tag_repo = TagRepository(db_session)
+                response = tag_repo.create_tag(body, note_id)
+                return response
 
         @self.app.patch(
             "/notes/{noteId}/tags",
@@ -152,14 +169,17 @@ class Main:
         def patch_notes_tags(
             body: NotesTagsPatchRequest = None,
             note_id: str = Path(..., alias="noteId"),
-            db_session=Depends(self.db.get_db_session),
+            db_session: Generator[Session, None, None] = Depends(
+                self.db.get_db_session
+            ),
         ) -> NotesTagsPatchResponse:
             """
             タグ更新
             """
-            tag_repo = TagRepository(db_session)
-            response = tag_repo.update_tag(body, note_id)
-            return response
+            with db_session as db_session:
+                tag_repo = TagRepository(db_session)
+                response = tag_repo.update_tag(body, note_id)
+                return response
 
 
 if __name__ == "__main__":

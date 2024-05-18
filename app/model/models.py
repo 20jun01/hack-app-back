@@ -39,10 +39,7 @@ class NotesGetResponse(BaseModel):
 
 
 class NotesPostRequest(BaseModel):
-    file: bytes = Field(
-        ...,
-        description="解析対象のノートの画像"
-    )
+    file: bytes = Field(..., description="解析対象のノートの画像")
 
 
 class NotesPostResponse(BaseModel):
