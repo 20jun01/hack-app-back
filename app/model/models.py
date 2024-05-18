@@ -62,3 +62,9 @@ class NotesTagsPatchRequest(BaseModel):
 
 class NotesTagsPatchResponse(BaseModel):
     pass
+
+class NotesByTagRequest(BaseModel):
+    tag: str
+
+class NotesByTagResponse:
+    notes: List[NoteRes]

@@ -23,6 +23,8 @@ from app import (
     NotesTagsPatchResponse,
     NotesTagsPostRequest,
     NotesTagsPostResponse,
+    NotesByTagRequest,
+    NotesByTagResponse,
     Database,
     Config,
     MyS3Client,
@@ -159,7 +161,9 @@ class Main:
                     notes_by_tag = note_repo.get_notes_by_tag(tag)
                     notes_by_tags.append(notes_by_tag)
 
-                return NotesPostResponse(noteId=str(note_id), tags=response.tags, notes=notes_by_tags)
+                return NotesPostResponse(
+                    noteId=str(note_id), tags=response.tags, notes=notes_by_tags
+                )
 
         @self.app.get("/notes/categories", response_model=NotesCategoriesGetResponse)
         def get_notes_categories(
@@ -230,6 +234,21 @@ class Main:
                 tag_repo = TagRepository(db_session)
                 response = tag_repo.update_tag(body, note_id)
                 return response
+
+        @self.app.get("/notes/{tag}", response_model=NotesByTagResponse)
+        def get_notes_by_tag(
+            tag: str,
+            db_session: Generator[Session, None, None] = Depends(
+                self.db.get_db_session
+            ),
+        ) -> NotesByTagResponse:
+            """
+            タグ検索
+            """
+            with db_session as db_session:
+                note_repo = NoteRepository(db_session)
+                notes = note_repo.get_notes_by_tag(tag)
+                return NotesByTagResponse(notes=notes)
 
 
 if __name__ == "__main__":
