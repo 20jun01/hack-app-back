@@ -2,4 +2,6 @@ from pydantic import BaseModel
 
 
 class ChatGPTResponse(BaseModel):
-    answer: str
+    category: str
+    subcategory: str
+    summary: str

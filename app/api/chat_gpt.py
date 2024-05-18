@@ -26,17 +26,28 @@ class ChatGPTAPI:
 
     def _load_template(self) -> dict:
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir, "chat.json")
+        file_path = os.path.join(current_dir, "data/chat.json")
         with open(file_path) as f:
             return json.load(f)
+
+    def _convert_answer_to_response(self, answer: str) -> ChatGPTResponse:
+        json_answer = json.loads(answer)
+        return ChatGPTResponse(
+            category=json_answer["category"],
+            subcategory=json_answer["subcategory"],
+            summary=json_answer["summary"],
+        )
 
     # TODO: template typeを用意して、Noneの時はpromptを使う
     def describe_image(
         self,
         image_base64: str,
-        prompt: str,
+        template: dict = None,
         model: ChatGPTModels.Models = ChatGPTModels.GPT4O,
     ) -> ChatGPTResponse:
+        if template is None:
+            template = self.template["describe_image"]
+
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.openai_api_key}",
@@ -45,9 +56,13 @@ class ChatGPTAPI:
             "model": model,
             "messages": [
                 {
+                    "role": "system",
+                    "content": [{"type": "text", "text": f"{template['system']}"}],
+                },
+                {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"{prompt}"},
+                        {"type": "text", "text": f"{template["prompt"]}"},
                         {
                             "type": "image_url",
                             "image_url": {
@@ -55,7 +70,11 @@ class ChatGPTAPI:
                             },
                         },
                     ],
-                }
+                },
+                {
+                    "role": "assistant",
+                    "content": [{"type": "text", "text": f"{template['assistant']}"}],
+                },
             ],
             "max_tokens": 300,
         }
@@ -66,25 +85,30 @@ class ChatGPTAPI:
 
         res = response.json()
         logger.info(res)
-        return ChatGPTResponse(
-            answer=res["choices"][0]["message"]["content"],
-        )
+        return self._convert_answer_to_response(res)
 
     def describe_uploaded_image(
         self,
         image_url: str,
-        prompt: str,
+        template: dict = None,
         model: ChatGPTModels.Models = ChatGPTModels.GPT4O,
     ) -> ChatGPTResponse:
+        if template is None:
+            template = self.template["describe_image"]
+
         client = OpenAI()
 
         response = client.chat.completions.create(
             model=model,
             messages=[
                 {
+                    "role": "system",
+                    "content": [{"type": "text", "text": f"{template['system']}"}],
+                },
+                {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"{prompt}"},
+                        {"type": "text", "text": f"{template['prompt']}"},
                         {
                             "type": "image_url",
                             "image_url": {
@@ -92,16 +116,18 @@ class ChatGPTAPI:
                             },
                         },
                     ],
-                }
+                },
+                {
+                    "role": "assistant",
+                    "content": [{"type": "text", "text": f"{template['assistant']}"}],
+                },
             ],
             max_tokens=300,
         )
 
         res = response.choices[0].message
         logger.info(res)
-        return ChatGPTResponse(
-            answer=res.content,
-        )
+        return self._convert_answer_to_response(res)
 
 
 """
