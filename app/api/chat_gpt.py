@@ -6,6 +6,7 @@ import requests
 from typing import Literal, Union
 from ..model import ChatGPTResponse
 from logging import getLogger
+
 logger = getLogger(__name__)
 
 
@@ -101,7 +102,6 @@ class ChatGPTAPI:
         return ChatGPTResponse(
             answer=res.content,
         )
-
 
 
 """

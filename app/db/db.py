@@ -3,11 +3,16 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from contextlib import contextmanager
 from .models import Base
 
+
 class Database:
-    def __init__(self, DB_HOST: str, DB_NAME: str, DB_USER: str, DB_PASSWORD: str) -> None:
+    def __init__(
+        self, DB_HOST: str, DB_NAME: str, DB_USER: str, DB_PASSWORD: str
+    ) -> None:
         self.DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
         self.engine = create_engine(self.DATABASE_URL)
-        self.SessionLocal = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=self.engine))
+        self.SessionLocal = scoped_session(
+            sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
+        )
 
     # with句で使えるメソッドを定義
     @contextmanager

@@ -21,3 +21,13 @@ deactivate:
 .PHONY: export
 export:
 	pip freeze > requirements.txt
+
+.PHONY: fmt
+fmt:
+	black ./main.py
+	black ./app
+
+.PHONY: lint
+lint:
+	flake8 --extend-ignore main.py
+	flake8 --extend-ignore ./app

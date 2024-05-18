@@ -24,6 +24,7 @@ class NoteRes(BaseModel):
     subCategories: List[str]
     comments: Optional[List[str]] = None
 
+
 class NoteReq(BaseModel):
     title: str
     content: str
@@ -39,8 +40,8 @@ class NotesGetResponse(BaseModel):
 class NotesPostRequest(BaseModel):
     file: bytes = Field(
         ...,
-        description='解析対象のノートの画像',
-        example='cmMtdXBsb2FkLTE3MTU1NjY2OTM4NzEtMg==/DALL·E 2024-04-24 11.13.03 - An abstract and data-inspired representation of a dark cyber space, focusing on digital data elements. Imagine a visual composition resembling data fl.webp',
+        description="解析対象のノートの画像",
+        example="cmMtdXBsb2FkLTE3MTU1NjY2OTM4NzEtMg==/DALL·E 2024-04-24 11.13.03 - An abstract and data-inspired representation of a dark cyber space, focusing on digital data elements. Imagine a visual composition resembling data fl.webp",
     )
 
 
@@ -50,7 +51,7 @@ class NotesPostResponse(BaseModel):
 
 
 class NotesTagsPostRequest(BaseModel):
-    tags: List[str] = Field(..., description='追加するタグ')
+    tags: List[str] = Field(..., description="追加するタグ")
 
 
 class NotesTagsPostResponse(BaseModel):
@@ -58,7 +59,7 @@ class NotesTagsPostResponse(BaseModel):
 
 
 class NotesTagsPatchRequest(BaseModel):
-    tags: List[str] = Field(..., description='新たなタグ')
+    tags: List[str] = Field(..., description="新たなタグ")
 
 
 class NotesTagsPatchResponse(BaseModel):

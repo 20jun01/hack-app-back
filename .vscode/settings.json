@@ -1,3 +1,11 @@
 {
-  "python.venvFolders": ["venv"]
+  "python.venvFolders": ["venv"],
+  "flake8.args": ["--config=.flake8"],
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "isort.args": ["--settings-file", "setup.cfg"]
 }
