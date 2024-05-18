@@ -22,14 +22,16 @@ class NoteRes(BaseModel):
     categories: List[str]
     summary: Optional[str] = None
     subCategories: List[str]
+    tags: List[str]
 
 
 class NoteReq(BaseModel):
     title: str
-    content: str
+    url: str
+    categories: List[str]
     summary: Optional[str] = None
     subCategories: List[str]
-    comments: Optional[List[str]] = None
+    tags: List[str]
 
 
 class NotesGetResponse(BaseModel):

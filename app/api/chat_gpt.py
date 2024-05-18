@@ -6,6 +6,7 @@ import requests
 from typing import Literal, Union
 from ..model import ChatGPTResponse
 from logging import getLogger
+import httpx
 
 logger = getLogger(__name__)
 
@@ -37,9 +38,59 @@ class ChatGPTAPI:
             subcategory=json_answer["subcategory"],
             summary=json_answer["summary"],
             title=json_answer["title"],
+            tags=json_answer["tags"],
         )
 
     # TODO: template typeを用意して、Noneの時はpromptを使う
+    async def async_describe_image(
+        self,
+        image_base64: str,
+        template: dict = None,
+        model: ChatGPTModels.Models = ChatGPTModels.GPT4O,
+    ) -> ChatGPTResponse:
+        if template is None:
+            template = self.template["describe_image"]
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.openai_api_key}",
+        }
+        payload = {
+            "model": model,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": [{"type": "text", "text": f"{template['system']}"}],
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": f"{template["prompt"]}"},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{image_base64}"
+                            },
+                        },
+                    ],
+                },
+                {
+                    "role": "assistant",
+                    "content": [{"type": "text", "text": f"{template['assistant']}"}],
+                },
+            ],
+            "max_tokens": 300,
+        }
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.openai.com/v1/chat/completions", headers=headers, json=payload
+            )
+
+        res = response.json()
+        logger.info(res)
+        return self._convert_answer_to_response(res)
+
     def describe_image(
         self,
         image_base64: str,
@@ -88,7 +139,7 @@ class ChatGPTAPI:
         logger.info(res)
         return self._convert_answer_to_response(res)
 
-    def describe_uploaded_image(
+    async def async_describe_uploaded_image(
         self,
         image_url: str,
         template: dict = None,
@@ -97,11 +148,8 @@ class ChatGPTAPI:
         if template is None:
             template = self.template["describe_image"]
 
-        client = OpenAI()
-
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
+        client = OpenAI(self.openai_api_key)
+        messages = [
                 {
                     "role": "system",
                     "content": [{"type": "text", "text": f"{template['system']}"}],
@@ -122,7 +170,11 @@ class ChatGPTAPI:
                     "role": "assistant",
                     "content": [{"type": "text", "text": f"{template['assistant']}"}],
                 },
-            ],
+            ]
+
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
             max_tokens=300,
         )
 
@@ -130,6 +182,48 @@ class ChatGPTAPI:
         logger.info(res)
         return self._convert_answer_to_response(res)
 
+    def describe_uploaded_image(
+        self,
+        image_url: str,
+        template: dict = None,
+        model: ChatGPTModels.Models = ChatGPTModels.GPT4O,
+    ) -> ChatGPTResponse:
+        if template is None:
+            template = self.template["describe_image"]
+
+        client = OpenAI(self.openai_api_key)
+        messages = [
+                {
+                    "role": "system",
+                    "content": [{"type": "text", "text": f"{template['system']}"}],
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": f"{template['prompt']}"},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"{image_url}",
+                            },
+                        },
+                    ],
+                },
+                {
+                    "role": "assistant",
+                    "content": [{"type": "text", "text": f"{template['assistant']}"}],
+                },
+            ]
+        
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            max_tokens=300,
+        )
+
+        res = response.choices[0].message
+        logger.info(res)
+        return self._convert_answer_to_response(res)
 
 """
 ## ChatGPT Response Example

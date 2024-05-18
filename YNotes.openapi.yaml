@@ -88,6 +88,10 @@ paths:
                         type: array
                         items:
                           type: string
+                      tags:
+                        type: array
+                        items:
+                          type: string
                     required:
                       - title
                       - categories
@@ -99,14 +103,14 @@ paths:
                   summary: 成功例
                   value:
                     note:
-                      title: title1
-                      content: http:example.png
-                      summary: this title is AAA
+                      title: 'a'
+                      summary: 'a'
+                      categories:
+                        - 'math'
                       subCategories:
-                        - subcat1
-                        - subcat2
-                      comments:
-                        - ''
+                        - 'algebra'
+                      tags:
+                        - 'tag'
       security: []
     post:
       summary: 解析

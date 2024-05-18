@@ -13,19 +13,20 @@ class NoteRepository:
         return NoteRes(
             id=dbNote.id,
             title=dbNote.title,
-            content=dbNote.content,
             summary=dbNote.summary,
             subCategories=dbNote.sub_categories,
-            comments=dbNote.comments,
+            categories=dbNote.categories,
+            tags=dbNote.tags,
         )
 
     def create_note(self, note: NoteReq):
         dbNote = Note(
             title=note.title,
+            image_id=note.url,
             summary=note.summary,
-            image_id=note.image_id,
             categories=note.categories,
-            sub_categories=note.sub_categories,
+            sub_categories=note.subCategories,
+            tags=note.tags,
         ).returning(Note.id)
 
         self.db_session.add(dbNote)

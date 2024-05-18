@@ -6,3 +6,5 @@ class ChatGPTResponse(BaseModel):
     subcategory: str
     summary: str
     title: str
+    tags: list
+    url: str = None
