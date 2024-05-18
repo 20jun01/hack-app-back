@@ -19,6 +19,10 @@ class NoteRepository:
         ]
         self.db_session.add_all(note_tags)
 
+    def update_note_tag(self, note_id: str, tag_ids: List[str]):
+        self.db_session.query(NoteTag).filter(NoteTag.note_id == note_id).delete()
+        self.create_note_tag(note_id, tag_ids)
+
     def create_note_category(self, note_id: str, category_ids: List[str]):
         note_categories = [
             NoteCategory(

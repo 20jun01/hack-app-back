@@ -11,6 +11,7 @@ class TagRepository:
         self.db_session = db_session
 
     def create_tag(self, body: NotesTagsPostRequest) -> NotesTagsPostResponse:
+        tag_ids = []
         for tag in set(body.tags):
             result = self.db_session.execute(
                 text("SELECT id FROM tags WHERE name = :name"), {"name": tag}
@@ -18,6 +19,7 @@ class TagRepository:
 
             if result:
                 tag_id = result[0]
+                tag_ids.append(tag_id)
                 continue
             dbTag = self.db_session.execute(
                 text(

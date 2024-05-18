@@ -213,7 +213,11 @@ class Main:
             """
             with db_session as db_session:
                 tag_repo = TagRepository(db_session)
-                response = tag_repo.create_tag(body, note_id)
+                tag_ids = tag_repo.create_tags(body)
+                db_session.commit()
+                note_repo = NoteRepository(db_session)
+                note_repo.create_note_tag(note_id, tag_ids)
+                response = NotesTagsPostResponse()
                 return response
 
         @self.app.patch(
@@ -232,7 +236,11 @@ class Main:
             """
             with db_session as db_session:
                 tag_repo = TagRepository(db_session)
-                response = tag_repo.update_tag(body, note_id)
+                tag_ids = tag_repo.create_tags(body)
+                db_session.commit()
+                note_repo = NoteRepository(db_session)
+                note_repo.create_note_tag(note_id, tag_ids)
+                response = NotesTagsPatchResponse()
                 return response
 
         @self.app.get("/notes/{tag}", response_model=NotesByTagResponse)
