@@ -50,6 +50,7 @@ class NoteRepository:
 
     def create_note(self, note: NoteReq, category_ids: List[str], sub_category_ids_map: dict, tag_ids: List[str]):
         dbNote: Note = Note(
+            id=uuid.uuid4(),
             user_id=uuid.uuid4(),
             title=note.title,
             image_id=note.url,
