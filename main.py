@@ -93,7 +93,7 @@ class Main:
         async def post_notes(
             file: UploadFile,
             db_session: Generator[Session, None, None] = Depends(
-                self.db.get_db_session
+                self.db.get_db_session_no_commit
             ),
         ) -> NotesPostResponse:
             """
@@ -113,12 +113,22 @@ class Main:
                 file_extension: str = file.filename.split(".")[-1]
 
                 categories = [response.category]
+                category_ids = []
                 subCategories = [response.subcategory]
+                sub_category_ids_map = dict()
                 for category in categories:
                     category_id = category_repo.create_category(category)
-                    db_session.flush()
+                    category_ids.append(category_id)
+                    sub_category_ids_map[category_id] = []
                     for sub_category in subCategories:
-                        category_repo.create_sub_category(sub_category, category_id)
+                        sub_category_id = category_repo.create_sub_category(
+                            sub_category, category_id
+                        )
+                        sub_category_ids_map[category_id].append(sub_category_id)
+
+                tags = response.tags
+
+                tag_ids = tag_repo.create_tags(tags)
 
                 image_url = self.s3.upload_image(file_object, file_extension)
                 note_req = NoteReq(
@@ -129,7 +139,10 @@ class Main:
                     subCategories=subCategories,
                     tags=response.tags,
                 )
-                note_id = note_repo.create_note(note_req)
+                note_id = note_repo.create_note(
+                    note_req, category_ids, sub_category_ids_map, tag_ids
+                )
+                db_session.commit()
                 return NotesPostResponse(noteId=str(note_id), tags=response.tags)
 
         @self.app.get("/notes/categories", response_model=NotesCategoriesGetResponse)

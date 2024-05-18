@@ -1,6 +1,7 @@
 from ..db import Category, SubCategory, CategorySubCategory
 from ..model import NotesCategoriesGetResponse, NotesCategoriesCategoryIdGetResponse
 from sqlalchemy.orm import scoped_session
+from sqlalchemy.sql import text
 from typing import List
 import uuid
 
@@ -29,18 +30,61 @@ class CategoryRepository:
         )
 
     def create_category(self, category: str):
+        result = self.db_session.execute(
+            text("SELECT id FROM categories WHERE name = :name"), {"name": category}
+        ).fetchone()
+
+        if result:
+            return result[0]
+
+        print("its not exist")
         dbCategory = Category(id=uuid.uuid4(), name=category)
-        self.db_session.add(dbCategory)
+
+        self.db_session.execute(
+            text(
+                """
+            INSERT INTO categories (id, name)
+            VALUES (:id, :name)
+            RETURNING id;
+            """
+            ),
+            {"id": dbCategory.id, "name": dbCategory.name},
+        )
+
         return dbCategory.id
 
     def create_sub_category(self, sub_category: str, category_id: uuid.UUID):
-        dbSubCategory = SubCategory(id=uuid.uuid4(), name=sub_category)
+        result = self.db_session.execute(
+            text("SELECT id FROM sub_categories WHERE name = :name"),
+            {"name": sub_category},
+        ).fetchone()
+        sub_category_id = None
 
-        self.db_session.add(dbSubCategory)
-        self.db_session.flush()
-        self.db_session.add(
-            CategorySubCategory(
-                category_id=category_id, sub_category_id=dbSubCategory.id
+        if result:
+            sub_category_id = result[0]
+        else:
+            dbSubCategory = SubCategory(id=uuid.uuid4(), name=sub_category)
+
+            self.db_session.execute(
+                text(
+                    """
+                INSERT INTO sub_categories (id, name)
+                VALUES (:id, :name)
+                RETURNING id;
+                """
+                ),
+                {"id": dbSubCategory.id, "name": dbSubCategory.name},
             )
+            sub_category_id = dbSubCategory.id
+
+        self.db_session.execute(
+            text(
+                """
+            INSERT INTO category_sub_categories (category_id, sub_category_id)
+            VALUES (:category_id, :sub_category_id);
+            """
+            ),
+            {"category_id": category_id, "sub_category_id": sub_category_id},
         )
-        return dbSubCategory.id
+
+        return sub_category_id

@@ -1,4 +1,4 @@
-from ..db import Note, Category, SubCategory, Tag
+from ..db import Note, Category, SubCategory, Tag, NoteCategory, NoteSubCategory, NoteTag
 from ..model import NoteRes, NoteReq
 from sqlalchemy.orm import scoped_session
 from typing import List, Optional
@@ -8,6 +8,34 @@ import uuid
 class NoteRepository:
     def __init__(self, db_session: scoped_session):
         self.db_session = db_session
+
+    def create_note_tag(self, note_id: str, tag_ids: List[str]):
+        note_tags = [
+            NoteTag(
+                note_id=note_id,
+                tag_id=tag_id,
+            ) for tag_id in tag_ids
+        ]
+        self.db_session.add_all(note_tags)
+
+
+    def create_note_category(self, note_id: str, category_ids: List[str]):
+        note_categories = [
+            NoteCategory(
+                note_id=note_id,
+                category_id=category_id,
+            ) for category_id in category_ids
+        ]
+        self.db_session.add_all(note_categories)
+
+    def create_note_sub_category(self, note_id: str, sub_category_ids: List[str]):
+        note_sub_categories = [
+            NoteSubCategory(
+                note_id=note_id,
+                sub_category_id=sub_category_id,
+            ) for sub_category_id in sub_category_ids
+        ]
+        self.db_session.add_all(note_sub_categories)
 
     def get_note_by_id(self, note_id: str) -> NoteRes:
         dbNote: Note = self.db_session.query(Note).filter(Note.id == note_id).first()
@@ -20,33 +48,18 @@ class NoteRepository:
             tags=dbNote.tags,
         )
 
-    def create_note(self, note: NoteReq):
-        categories: List[Category] = [
-            Category(
-                name=category,
-            ) for category in note.categories
-        ]
-        subcategories: List[SubCategory] = [
-            SubCategory(
-                name=subcategory,
-            ) for subcategory in note.subCategories
-        ]
-        tags: List[Tag] = [
-            Tag(
-                name=tag,
-            ) for tag in note.tags
-        ]
-
+    def create_note(self, note: NoteReq, category_ids: List[str], sub_category_ids_map: dict, tag_ids: List[str]):
         dbNote: Note = Note(
             user_id=uuid.uuid4(),
             title=note.title,
             image_id=note.url,
             summary=note.summary,
-            categories=categories,
-            sub_categories=subcategories,
-            tags=tags,
         )
         self.db_session.add(dbNote)
+
+        self.create_note_category(dbNote.id, category_ids)
+        self.create_note_sub_category(dbNote.id, sub_category_ids_map)
+        self.create_note_tag(dbNote.id, tag_ids)
 
         return dbNote.id
 

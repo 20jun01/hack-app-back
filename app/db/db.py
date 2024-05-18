@@ -31,6 +31,21 @@ class Database:
         finally:
             # 後処理
             session.close()
+    
+    @contextmanager
+    def get_db_session_no_commit(self):
+        # 前処理
+        session = self.SessionLocal()
+        try:
+            # withで渡す値
+            yield session
+        except Exception:
+            # エラーが発生した場合の後処理
+            session.rollback()
+            raise
+        finally:
+            # 後処理
+            session.close()
 
     def migrate(self):
         Base.metadata.create_all(self.engine)
