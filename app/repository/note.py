@@ -57,6 +57,7 @@ class NoteRepository:
             summary=note.summary,
         )
         self.db_session.add(dbNote)
+        self.db_session.commit()
 
         self.create_note_category(dbNote.id, category_ids)
         self.create_note_sub_category(dbNote.id, sub_category_ids_map)
