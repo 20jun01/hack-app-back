@@ -18,6 +18,7 @@ from app import (
     NotesCategoriesGetResponse,
     NotesGetResponse,
     NotesPostResponse,
+    NoteReq,
     NotesTagsPatchRequest,
     NotesTagsPatchResponse,
     NotesTagsPostRequest,
@@ -107,8 +108,15 @@ class Main:
                 response: ChatGPTResponse = self.chatgpt.describe_image(image_base64)
                 file_extension: str = file.filename.split(".")[-1]
                 image_url = self.s3.upload_image(file_object, file_extension)
-                response.url = image_url
-                note_id = note_repo.create_note(response)
+                note_req =  NoteReq(
+                    title=response.title,
+                    url=image_url,
+                    categories=[response.category],
+                    summary=response.summary,
+                    subCategories=[response.subcategory],
+                    tags=response.tags,
+                )
+                note_id = note_repo.create_note(note_req)
                 return NotesPostResponse(noteId=note_id, tags=response.tags)
 
         @self.app.get("/notes/categories", response_model=NotesCategoriesGetResponse)
