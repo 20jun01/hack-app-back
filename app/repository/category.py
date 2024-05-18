@@ -13,7 +13,7 @@ class CategoryRepository:
     def get_categories(self) -> NotesCategoriesGetResponse:
         dbCategories: List[Category] = self.db_session.query(Category).distinct().all()
         return NotesCategoriesGetResponse(
-            categories=[category for category in dbCategories]
+            categories=[category.name for category in dbCategories]
         )
 
     def get_sub_categories(
@@ -26,7 +26,7 @@ class CategoryRepository:
             .all()
         )
         return NotesCategoriesCategoryIdGetResponse(
-            categories=[sub_category for sub_category in dbSubCategories]
+            categories=[sub_category.name for sub_category in dbSubCategories]
         )
 
     def create_category(self, category: str):

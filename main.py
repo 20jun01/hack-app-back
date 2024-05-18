@@ -250,7 +250,6 @@ class Main:
                 notes = note_repo.get_notes_by_tag(tag)
                 return NotesByTagResponse(notes=notes)
 
-
 if __name__ == "__main__":
     import uvicorn
 
