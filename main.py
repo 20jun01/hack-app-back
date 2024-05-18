@@ -10,7 +10,6 @@ from fastapi import FastAPI, Path, UploadFile, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from io import BufferedReader
-import asyncio
 
 from app import (
     NotesCategoriesCategoryIdGetResponse,

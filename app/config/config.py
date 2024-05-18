@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 import json
-from logging import getLogger, config
+from logging import config
 
 
 class Config:

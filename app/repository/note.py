@@ -1,4 +1,4 @@
-from ..db import Note, Tag
+from ..db import Note
 from ..model import NoteRes, NoteReq
 from sqlalchemy.orm import scoped_session
 from typing import List, Optional

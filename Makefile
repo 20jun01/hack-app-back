@@ -29,5 +29,5 @@ fmt:
 
 .PHONY: lint
 lint:
-	flake8 --extend-ignore main.py
-	flake8 --extend-ignore ./app
+	flake8 main.py
+	flake8 ./app

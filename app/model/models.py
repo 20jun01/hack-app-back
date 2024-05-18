@@ -41,8 +41,7 @@ class NotesGetResponse(BaseModel):
 class NotesPostRequest(BaseModel):
     file: bytes = Field(
         ...,
-        description="解析対象のノートの画像",
-        example="cmMtdXBsb2FkLTE3MTU1NjY2OTM4NzEtMg==/DALL·E 2024-04-24 11.13.03 - An abstract and data-inspired representation of a dark cyber space, focusing on digital data elements. Imagine a visual composition resembling data fl.webp",
+        description="解析対象のノートの画像"
     )
 
 
