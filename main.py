@@ -129,7 +129,6 @@ class Main:
                         sub_category_id = category_repo.create_sub_category(
                             sub_category, category_id
                         )
-                        print(sub_category_id)
                         sub_category_ids_map[category_id].append(sub_category_id)
                     db_session.commit()
 

@@ -35,7 +35,7 @@ class NoteReq(BaseModel):
 
 
 class NotesGetResponse(BaseModel):
-    note: NoteRes
+    notes: List[NoteRes]
 
 
 class NotesPostRequest(BaseModel):

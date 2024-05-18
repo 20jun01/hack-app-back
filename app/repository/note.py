@@ -76,6 +76,7 @@ class NoteRepository:
         return dbNote.id
 
     def get_notes(self, keyword: Optional[str] = None) -> List[NoteRes]:
+        print(keyword)
         if keyword:
             dbNotes: List[Note] = (
                 self.db_session.query(Note)
@@ -84,13 +85,18 @@ class NoteRepository:
             )
         else:
             dbNotes: List[Note] = self.db_session.query(Note).all()
+        print(dbNotes)
         return [
             NoteRes(
-                id=dbNote.id,
-                categories=dbNote.categories,
                 title=dbNote.title,
+                categories=[category.name for category in dbNote.categories],
                 summary=dbNote.summary,
-                subCategories=dbNote.sub_categories,
+                subCategories=[
+                    sub_category.name for sub_category in dbNote.sub_categories
+                ],
+                tags=[
+                    tag.name for tag in dbNote.tags
+                ]
             )
             for dbNote in dbNotes
         ]
