@@ -65,7 +65,7 @@ class ChatGPTAPI:
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"{template["prompt"]}"},
+                        {"type": "text", "text": f"{template['prompt']}"},
                         {
                             "type": "image_url",
                             "image_url": {
@@ -116,7 +116,7 @@ class ChatGPTAPI:
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": f"{template["prompt"]}"},
+                        {"type": "text", "text": f"{template['prompt']}"},
                         {
                             "type": "image_url",
                             "image_url": {
