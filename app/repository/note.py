@@ -1,6 +1,7 @@
 from ..db import Note
 from ..model import NoteRes, NoteReq
 from sqlalchemy.orm import scoped_session
+from typing import List, Optional
 
 
 class NoteRepository:
@@ -28,3 +29,25 @@ class NoteRepository:
         ).returning(Note.id)
 
         self.db_session.add(dbNote)
+
+        return dbNote.id
+
+    def get_notes(self, keyword: Optional[str] = None) -> List[NoteRes]:
+        if keyword:
+            dbNotes: List[Note] = (
+                self.db_session.query(Note)
+                .filter(Note.title.ilike(f"%{keyword}%"))
+                .all()
+            )
+        else:
+            dbNotes: List[Note] = self.db_session.query(Note).all()
+        return [
+            NoteRes(
+                id=dbNote.id,
+                categories=dbNote.categories,
+                title=dbNote.title,
+                summary=dbNote.summary,
+                subCategories=dbNote.sub_categories,
+            )
+            for dbNote in dbNotes
+        ]

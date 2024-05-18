@@ -78,21 +78,19 @@ paths:
                     properties:
                       title:
                         type: string
-                      content:
-                        type: string
                       summary:
                         type: string
-                      subCategories:
+                      categories:
                         type: array
                         items:
                           type: string
-                      comments:
+                      subCategories:
                         type: array
                         items:
                           type: string
                     required:
                       - title
-                      - content
+                      - categories
                       - subCategories
                 required:
                   - note

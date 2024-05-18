@@ -14,6 +14,7 @@ from app import (
     NotesCategoriesCategoryIdGetResponse,
     NotesCategoriesGetResponse,
     NotesGetResponse,
+    NoteRes,
     NotesPostResponse,
     NotesTagsPatchRequest,
     NotesTagsPatchResponse,
@@ -23,6 +24,7 @@ from app import (
     Config,
     S3Client,
     ChatGPTAPI,
+    NoteRepository,
 )
 
 
@@ -70,15 +72,10 @@ class Main:
             """
             検索
             """
-            return NotesGetResponse(
-                note={
-                    "title": "title",
-                    "content": "content",
-                    "summary": "summary",
-                    "subCategories": ["subCategories"],
-                    "comments": ["comments"],
-                }
-            )
+            note_repo = NoteRepository(db_session)
+            notes = note_repo.get_notes(keyword)
+
+            return NotesGetResponse(notes=notes)
 
         @self.app.post("/notes", response_model=NotesPostResponse)
         def post_notes(

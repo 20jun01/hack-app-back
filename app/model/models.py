@@ -19,10 +19,9 @@ class NotesCategoriesGetResponse(BaseModel):
 
 class NoteRes(BaseModel):
     title: str
-    content: str
+    categories: List[str]
     summary: Optional[str] = None
     subCategories: List[str]
-    comments: Optional[List[str]] = None
 
 
 class NoteReq(BaseModel):

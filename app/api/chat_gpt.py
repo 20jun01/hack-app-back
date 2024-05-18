@@ -36,6 +36,7 @@ class ChatGPTAPI:
             category=json_answer["category"],
             subcategory=json_answer["subcategory"],
             summary=json_answer["summary"],
+            title=json_answer["title"],
         )
 
     # TODO: template typeを用意して、Noneの時はpromptを使う
