@@ -52,6 +52,7 @@ class NoteRepository:
             subCategories=dbNote.sub_categories,
             categories=dbNote.categories,
             tags=dbNote.tags,
+            url=dbNote.image_id
         )
 
     def create_note(
@@ -100,7 +101,8 @@ class NoteRepository:
                 ],
                 tags=[
                     tag.name for tag in dbNote.tags
-                ]
+                ],
+                url=dbNote.image_id
             )
             for dbNote in dbNotes
         ]
@@ -123,7 +125,8 @@ class NoteRepository:
                 ],
                 tags=[
                     tag.name for tag in dbNote.tags
-                ]
+                ],
+                url=dbNote.image_id
             )
             for dbNote in dbNotes
         ]

@@ -23,6 +23,7 @@ class NoteRes(BaseModel):
     summary: Optional[str] = None
     subCategories: List[str]
     tags: List[str]
+    url: str = None
 
 
 class NoteReq(BaseModel):
@@ -46,6 +47,7 @@ class NotesPostResponse(BaseModel):
     noteId: str
     tags: List[str]
     notes: List[NoteRes]
+    url: str = None
 
 
 class NotesTagsPostRequest(BaseModel):

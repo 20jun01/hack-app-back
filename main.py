@@ -163,7 +163,7 @@ class Main:
                     notes_by_tags.extend(notes_by_tag)
 
                 return NotesPostResponse(
-                    noteId=str(note_id), tags=response.tags, notes=notes_by_tags
+                    noteId=str(note_id), tags=response.tags, notes=notes_by_tags, url=image_url
                 )
 
         @self.app.get("/notes/categories", response_model=NotesCategoriesGetResponse)
