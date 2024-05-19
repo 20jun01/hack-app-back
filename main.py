@@ -142,6 +142,7 @@ class Main:
 
                 note_repo = NoteRepository(db_session)
 
+                file_object.seek(0)
                 image_url = self.s3.upload_image(file_object, file_extension)
                 note_req = NoteReq(
                     title=response.title,
