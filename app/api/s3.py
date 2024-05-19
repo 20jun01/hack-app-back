@@ -34,5 +34,17 @@ class MyS3Client:
     def upload_image(self, file: BufferedReader, file_extension: str) -> str:
         upload_path = f"{self.upload_dir}/{uuid.uuid4()}.{file_extension}"
         self.client.upload_fileobj(file, self.bucket_name, upload_path)
+        self.client.put_public_access_block(
+            Bucket=self.bucket_name,
+            PublicAccessBlockConfiguration={
+                "BlockPublicAcls": False,
+                "IgnorePublicAcls": False,
+                "BlockPublicPolicy": False,
+                "RestrictPublicBuckets": False,
+            },
+        )
+        self.client.put_object_acl(
+            ACL="public-read", Bucket=self.bucket_name, Key=upload_path
+        )
         url: str = f"https://{self.bucket_name}.s3.amazonaws.com/{upload_path}"
         return url
