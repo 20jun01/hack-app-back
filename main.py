@@ -157,13 +157,13 @@ class Main:
                 )
                 db_session.commit()
 
-                notes_by_tags = []
-                for tag in tags:
-                    notes_by_tag = note_repo.get_notes_by_tag(tag)
-                    notes_by_tags.extend(notes_by_tag)
+                notes_by_tags = note_repo.get_notes_by_tags(tags)
 
                 return NotesPostResponse(
-                    noteId=str(note_id), tags=response.tags, notes=notes_by_tags, url=image_url
+                    noteId=str(note_id),
+                    tags=response.tags,
+                    notes=notes_by_tags,
+                    url=image_url,
                 )
 
         @self.app.get("/notes/categories", response_model=NotesCategoriesGetResponse)
@@ -258,6 +258,7 @@ class Main:
                 note_repo = NoteRepository(db_session)
                 notes = note_repo.get_notes_by_tag(tag)
                 return NotesByTagResponse(notes=notes)
+
 
 if __name__ == "__main__":
     import uvicorn

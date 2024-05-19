@@ -5,6 +5,7 @@ from typing import List, Optional
 import uuid
 from sqlalchemy.orm.exc import NoResultFound
 
+
 class NoteRepository:
     def __init__(self, db_session: scoped_session):
         self.db_session = db_session
@@ -52,7 +53,7 @@ class NoteRepository:
             subCategories=dbNote.sub_categories,
             categories=dbNote.categories,
             tags=dbNote.tags,
-            url=dbNote.image_id
+            url=dbNote.image_id,
         )
 
     def create_note(
@@ -99,14 +100,12 @@ class NoteRepository:
                 subCategories=[
                     sub_category.name for sub_category in dbNote.sub_categories
                 ],
-                tags=[
-                    tag.name for tag in dbNote.tags
-                ],
-                url=dbNote.image_id
+                tags=[tag.name for tag in dbNote.tags],
+                url=dbNote.image_id,
             )
             for dbNote in dbNotes
         ]
-    
+
     def get_notes_by_tag(self, tag: str) -> List[NoteRes]:
         dbNotes: List[Note] = (
             self.db_session.query(Note)
@@ -123,10 +122,30 @@ class NoteRepository:
                 subCategories=[
                     sub_category.name for sub_category in dbNote.sub_categories
                 ],
-                tags=[
-                    tag.name for tag in dbNote.tags
+                tags=[tag.name for tag in dbNote.tags],
+                url=dbNote.image_id,
+            )
+            for dbNote in dbNotes
+        ]
+
+    def get_notes_by_tags(self, tags: List[str]) -> List[NoteRes]:
+        dbNotes: List[Note] = (
+            self.db_session.query(Note)
+            .join(NoteTag)
+            .join(Tag)
+            .filter(Tag.name.in_(tags))
+            .all()
+        )
+        return [
+            NoteRes(
+                title=dbNote.title,
+                categories=[category.name for category in dbNote.categories],
+                summary=dbNote.summary,
+                subCategories=[
+                    sub_category.name for sub_category in dbNote.sub_categories
                 ],
-                url=dbNote.image_id
+                tags=[tag.name for tag in dbNote.tags],
+                url=dbNote.image_id,
             )
             for dbNote in dbNotes
         ]
